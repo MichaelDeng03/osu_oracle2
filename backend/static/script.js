@@ -79,12 +79,14 @@ function modsToImages(mods) {
     const cdn = 'https://raw.githubusercontent.com/ppy/osu-web/459ef4ad903647aef0daf6d4a24f4eb5fe436e4c/public/images/badges/mods/mod_'
     const template = `<img src="${cdn}MOD.png" original="ORIGINAL" width=25px>`
 
-    // TODO: Missing some niche mods like EZ & Flashlight, but I doubt badeu would be using this for now.
     // I'm being lazy.
     mods = mods.replace('Hidden', template.replace('MOD', 'hidden'))
     mods = mods.replace('Double Time', template.replace('MOD', 'double-time'))
-    mods = mods.replace('Nightcore', template.replace('MOD', 'double-time'))
+    mods = mods.replace('Nightcore', template.replace('MOD', 'nightcore.png'))
     mods = mods.replace('Hard Rock', template.replace('MOD', 'hard-rock'))
+    mods = mods.replace('Flashlight', template.replace('MOD', 'flashlight'))
+    mods = mods.replace('Easy', template.replace('MOD', 'easy'))
+    // mods = mods.replace('Half Time', template.replace('MOD', 'half-time')) bruh i cna't be bothered.
     mods = mods.replaceAll(',', '')
 
     return mods
