@@ -183,9 +183,9 @@ function addRecommendedBeatmaps(recommendedBeatmaps) {
             const stars = newRow.insertCell(2);
             const modsCell = newRow.insertCell(3);
 
-            // beatmapIDCell.textContent = beatmap['beatmap_id'];
+
             beatmapLink.href = beatmap['beatmap_link'];
-            beatmapLink.textContent = beatmap['beatmap_id'];
+            beatmapLink.innerHTML = `<i class="fa-solid fa-map"></i>`;
             beatmapIDCell.appendChild(beatmapLink);
             beatmapName.textContent = beatmap['title'];
             stars.textContent = beatmap['stars'];
