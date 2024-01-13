@@ -183,15 +183,15 @@ function addRecommendedBeatmaps(recommendedBeatmaps) {
             const beatmapLink = document.createElement('a');
             const beatmapName = newRow.insertCell(1);
             const stars = newRow.insertCell(2);
-            const modsCell = newRow.insertCell(3);
-
+            const length = newRow.insertCell(3);
+            const modsCell = newRow.insertCell(4);
 
             beatmapLink.href = beatmap['beatmap_link'];
             beatmapLink.innerHTML = `<i class="fa-solid fa-map"></i>`;
             beatmapIDCell.appendChild(beatmapLink);
             beatmapName.textContent = beatmap['title'];
             stars.textContent = beatmap['stars'];
-
+            length.textContent = beatmap['length'];
             modsCell.innerHTML = modsToImages(beatmap["mods"]);
             modsCell.setAttribute('mods', beatmap["mods"]);
         });
@@ -199,7 +199,7 @@ function addRecommendedBeatmaps(recommendedBeatmaps) {
         // LINE GOES HERE
         const divider = tableBody.insertRow(-1);
         const dividerCell = divider.insertCell(0);
-        dividerCell.colSpan = 4;
+        dividerCell.colSpan = 5;
         hr = document.createElement('hr');
         dividerCell.appendChild(hr);
 

@@ -6,6 +6,8 @@ import numpy as np
 from ossapi import Ossapi
 import sqlite3
 import threading
+from time import strftime
+from time import gmtime
 
 # from pyclustering.cluster.xmeans import xmeans
 from sklearn.cluster import KMeans
@@ -186,6 +188,30 @@ def get_beatmap_stars(beatmap_id):
         return stars
 
 
+def get_beatmap_length(beatmap_id):
+    try:
+        conn = sqlite3.connect("../data/osu.db")
+        cursor = conn.cursor()
+        query = f"SELECT length_seconds FROM beatmaps WHERE beatmap_id = {beatmap_id}"
+        length = cursor.execute(query).fetchone()[0]
+    except Exception as e:
+        print(e)
+        beatmap = Beatmap(api.beatmap(beatmap_id))
+        beatmapset = Beatmapset(api.beatmapset(beatmap.beatmapset_id))
+
+        lock.acquire()
+        beatmap.insert(cursor)
+        beatmapset.insert(cursor)
+        conn.commit()
+        lock.release()
+        length = beatmap.total_length
+    finally:
+        length = int(length)
+        # Convert to hour minutes seconds
+        length = strftime("%M:%S", gmtime(length))
+        return length
+
+
 @app.route("/get_user_scores/<int:user_id>")
 def get_user_scores(user_id):
     try:
@@ -282,6 +308,7 @@ def predict_beatmaps():
     user_scores = [tuple(word2vec_model.wv[score]) for score in user_scores]
 
     # Cluster user scores so skillsets are not mixed.
+    # xmeans tended to create 2 clusters only with like a 95/5 split.
     if detect_skillsets:
         # xmeans_instance = xmeans(
         #     data=user_scores,
@@ -329,6 +356,7 @@ def predict_beatmaps():
                     "title": title,
                     "beatmap_link": get_beatmap_link(beatmap_id),
                     "stars": get_beatmap_stars(beatmap_id),
+                    "length": get_beatmap_length(beatmap_id),
                 }
             )
         rows.append(row_segment)
