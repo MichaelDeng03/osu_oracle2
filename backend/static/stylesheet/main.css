@@ -16,9 +16,12 @@
     --text-secondary: #cccccc;
 
     /* Accent colors */
-    --accent-primary: #4caf50; /* Green accent color */
-    --accent-secondary: #3498db; /* Blue accent color */
-    --accent-tertiary: #e74c3c; /* Red accent color */
+    --accent-primary: #4caf50;
+    /* Green accent color */
+    --accent-secondary: #3498db;
+    /* Blue accent color */
+    --accent-tertiary: #e74c3c;
+    /* Red accent color */
 
     /* Border colors */
     --border-color: #333333;
@@ -38,7 +41,8 @@
     --box-shadow: rgba(0, 0, 0, 0.3);
 }
 
-html, body {
+html,
+body {
     margin: 0px;
     padding: 0px;
 
@@ -59,7 +63,7 @@ h1 {
     border-radius: 6px;
     background-color: var(--background-header);
 
-    box-shadow: 2px 2px 6px rgba(0,0,0,.1);
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, .1);
     margin-bottom: 0px;
 
     border-bottom-left-radius: 0px;
@@ -75,7 +79,7 @@ h1 {
 }
 
 button {
-    box-shadow: 2px 2px 6px rgba(0,0,0,.1);
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, .1);
 }
 
 nav {
@@ -126,14 +130,16 @@ h2 {
     cursor: pointer;
 }
 
-.fa-link, .fa-map {
+.fa-link,
+.fa-map {
     color: var(--text-secondary);
 
     transition: transform ease 0.2s;
 }
 
 
-.fa-link:hover, .fa-map:hover {
+.fa-link:hover,
+.fa-map:hover {
     color: var(--accent-secondary);
 
     transform: scale(1.1);

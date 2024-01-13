@@ -119,7 +119,7 @@ function addUserScore(row) {
     beatmapIDCell.appendChild(beatmapLink);
 
     beatmapNameCell.textContent = row["beatmap_name"];
-    
+
     modsCell.innerHTML = modsToImages(row["mods"]);
     modsCell.setAttribute('mods', row["mods"]);
 
@@ -181,7 +181,7 @@ function addRecommendedBeatmaps(recommendedBeatmaps) {
             const beatmapLink = document.createElement('a');
             const beatmapName = newRow.insertCell(1);
             const stars = newRow.insertCell(2);
-            const mods = newRow.insertCell(3);
+            const modsCell = newRow.insertCell(3);
 
             // beatmapIDCell.textContent = beatmap['beatmap_id'];
             beatmapLink.href = beatmap['beatmap_link'];
@@ -189,9 +189,11 @@ function addRecommendedBeatmaps(recommendedBeatmaps) {
             beatmapIDCell.appendChild(beatmapLink);
             beatmapName.textContent = beatmap['title'];
             stars.textContent = beatmap['stars'];
-            mods.innerHTML = modsToImages(row["mods"]);
-            mods.setAttribute('mods', row["mods"]);
+
+            modsCell.innerHTML = modsToImages(beatmap["mods"]);
+            modsCell.setAttribute('mods', beatmap["mods"]);
         });
+
         // LINE GOES HERE
         const divider = tableBody.insertRow(-1);
         const dividerCell = divider.insertCell(0);
@@ -217,7 +219,7 @@ function getColor(value) {
 
     var index = 0;
     while (clampedValue > domain[index]) {
-      index++;
+        index++;
     }
 
     var interpolationFactor = (clampedValue - domain[index - 1]) / (domain[index] - domain[index - 1]);
