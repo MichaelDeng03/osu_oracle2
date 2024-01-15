@@ -9,7 +9,8 @@ import time
 import sys
 
 sys.path.insert(
-    0, "../" # I run this script from scraping sometimes so I need to add the parent directory to the path
+    0,
+    "../",  # I run this script from scraping sometimes so I need to add the parent directory to the path
 )  # To import osu_access_token and classes from parent directory
 from osu_access_token import client_id, client_secret
 
@@ -78,7 +79,7 @@ def insert_ids(ids, conn):
         print("No new ids to insert")
 
 
-conn = sqlite3.connect("../data/osu.db") 
+conn = sqlite3.connect("../data/osu.db")
 for country_code in country_codes:
     ids = get_user_ids_from_lb(country_code)
     insert_ids(ids, conn)
