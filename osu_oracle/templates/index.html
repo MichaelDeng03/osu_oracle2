@@ -44,12 +44,12 @@
                 </li>
         </div>
     </nav>
-    <div class="container-fluid col-md-9">
+    <div class="container-fluid col-md-11">
         <div class="row">
             <!--
                 Score population, left-hand side.
             -->
-            <div class="section col-md-6">
+            <div class="section col-md-5">
                 <h1>Scores</h1>
                 <div class="section-color">
                     <!--
@@ -77,14 +77,13 @@
                     <input type="text" class="form-control" id="scoreID"
                         placeholder="https://osu.ppy.sh/scores/osu/4470046750">
                     <button type="submit" id="submitScoreID" class="btn btn-primary section-submit">Fetch
-                        Beatmap</button>
+                        Score</button>
 
                     <table class="table table-dark table-striped" id="scoresTable">
                         <thead>
                             <tr>
                                 <th> Score </th>
                                 <th> Map </th>
-                                <th> Name </th>
                                 <th> Mods </th>
                                 <th> Rank </th>
                                 <th> </th>
@@ -98,7 +97,7 @@
             <!--
                 Beatmap recommendations, right-hand side.
             -->
-            <div class="section col-md-6">
+            <div class="section col-md-7">
                 <h1> Recommendations </h1>
                 <div class="section-color">
 
@@ -120,8 +119,9 @@
                             <thead>
                                 <tr>
                                     <th> Map </th>
-                                    <th> Name </th>
                                     <th> Stars </th>
+                                    <th> AR </th>
+                                    <th> BPM </th>
                                     <th> Length </th>
                                     <th> Mods </th>
                                 </tr>

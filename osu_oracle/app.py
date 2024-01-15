@@ -24,7 +24,7 @@ conn = sqlite3.connect(
 lock = threading.Lock()
 
 word2vec_model_std = gensim.models.Word2Vec.load(
-    "../Models/w2v_model_50d_50e/w2v_model_50d_50e"
+    "../Models/w2v_model_200d/w2v_model_200d"
 )
 NN_std = NearestNeighbors(n_neighbors=100, algorithm="ball_tree").fit(
     word2vec_model_std.wv.vectors
@@ -117,6 +117,35 @@ def home():
     return render_template("index.html")
 
 
+def get_beatmap_attr(beatmap_id, attr):
+    """
+    attr: list of attributes to get
+    returns: dictionary of attributes
+    """
+    conn = sqlite3.connect("../data/osu.db")
+    cursor = conn.cursor()
+    try:
+        query = f"SELECT {','.join(attr)} FROM beatmaps WHERE beatmap_id = {beatmap_id}"
+        attr_res = cursor.execute(query).fetchone()
+        attr_res = {attr[i]: attr_res[i] for i in range(len(attr))}
+    except Exception as e:
+        print(e)
+        beatmap = Beatmap(api.beatmap(beatmap_id))
+        beatmapset = Beatmapset(api.beatmapset(beatmap.beatmapset_id))
+
+        lock.acquire()
+        beatmap.insert(cursor)
+        beatmapset.insert(cursor)
+        conn.commit()
+        lock.release()
+
+        query = f"SELECT {','.join(attr)} FROM beatmaps WHERE beatmap_id = {beatmap_id}"
+        attr_res = cursor.execute(query).fetchone()
+        attr_res = {attr[i]: attr_res[i] for i in range(len(attr))}
+    finally:
+        return attr_res
+
+
 def get_beatmap_name(beatmap_id):
     conn = sqlite3.connect("../data/osu.db")
     cursor = conn.cursor()
@@ -165,53 +194,6 @@ def get_beatmap_link(beatmap_id):
         return f"https://osu.ppy.sh/beatmapsets/{beatmapset_id}#osu/{beatmap_id}"
 
 
-def get_beatmap_stars(beatmap_id):
-    try:
-        conn = sqlite3.connect("../data/osu.db")
-        cursor = conn.cursor()
-        query = (
-            f"SELECT difficulty_rating FROM beatmaps WHERE beatmap_id = {beatmap_id}"
-        )
-        stars = cursor.execute(query).fetchone()[0]
-    except Exception as e:
-        print(e)
-        beatmap = Beatmap(api.beatmap(beatmap_id))
-        beatmapset = Beatmapset(api.beatmapset(beatmap.beatmapset_id))
-
-        lock.acquire()
-        beatmap.insert(cursor)
-        beatmapset.insert(cursor)
-        conn.commit()
-        lock.release()
-        stars = beatmap.difficulty_rating
-    finally:
-        return stars
-
-
-def get_beatmap_length(beatmap_id):
-    try:
-        conn = sqlite3.connect("../data/osu.db")
-        cursor = conn.cursor()
-        query = f"SELECT length_seconds FROM beatmaps WHERE beatmap_id = {beatmap_id}"
-        length = cursor.execute(query).fetchone()[0]
-    except Exception as e:
-        print(e)
-        beatmap = Beatmap(api.beatmap(beatmap_id))
-        beatmapset = Beatmapset(api.beatmapset(beatmap.beatmapset_id))
-
-        lock.acquire()
-        beatmap.insert(cursor)
-        beatmapset.insert(cursor)
-        conn.commit()
-        lock.release()
-        length = beatmap.total_length
-    finally:
-        length = int(length)
-        # Convert to hour minutes seconds
-        length = strftime("%M:%S", gmtime(length))
-        return length
-
-
 @app.route("/get_user_scores/<int:user_id>")
 def get_user_scores(user_id):
     try:
@@ -257,7 +239,7 @@ def get_user_score(score_id):
 
     row = {
         "score_id": score.score_id,
-        "beatmap_id": score.beatmap_id,
+        # "beatmap_id": score.beatmap_id,
         "beatmap_link": get_beatmap_link(score.beatmap_id),
         "beatmap_name": score.name,
         "mods": score.mods,
@@ -336,7 +318,7 @@ def predict_beatmaps():
 
     for center in centers:
         # Consider it a cluster only if it has more than 5% of the scores
-        row_segment = []
+        rows_partition = []
         center = [np.array(center)]
         _, indices = NN.kneighbors(center)
         beatmaps_and_mods = [word2vec_model.wv.index_to_key[i] for i in indices[0]][
@@ -345,21 +327,25 @@ def predict_beatmaps():
 
         for beatmap_and_mods in beatmaps_and_mods:
             beatmap_id, mods = beatmap_and_mods.split("-")
-            mods = int(mods)
-            mods = mod_enum_to_names(mods)
-            title = get_beatmap_name(beatmap_id)
-
-            row_segment.append(
-                {
-                    "beatmap_id": beatmap_id,
-                    "mods": mods,
-                    "title": title,
-                    "beatmap_link": get_beatmap_link(beatmap_id),
-                    "stars": get_beatmap_stars(beatmap_id),
-                    "length": get_beatmap_length(beatmap_id),
-                }
+            row = {
+                "beatmap_link": get_beatmap_link(beatmap_id),
+                "mods": mod_enum_to_names(int(mods)),
+                "title": get_beatmap_name(beatmap_id),
+            }
+            row.update(
+                get_beatmap_attr(
+                    beatmap_id,
+                    ["bpm", "ar", "length_seconds", "difficulty_rating"],
+                )
             )
-        rows.append(row_segment)
+
+            row["length_seconds"] = strftime(
+                "%M:%S", gmtime(row["length_seconds"])
+            )  # Not really an accurate name for it, but MM:SS is more readable, and I would rather do it here than in the JS where I don't know what i'm doing.
+            
+            rows_partition.append(row)
+
+        rows.append(rows_partition)
 
     return jsonify(rows)
 

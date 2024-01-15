@@ -43,11 +43,11 @@ function addUserTopScores(scoreRows) {
         const newRow = tableBody.insertRow(-1);
 
         const scoreIDCell = newRow.insertCell(0);
-        const beatmapIDCell = newRow.insertCell(1);
-        const beatmapNameCell = newRow.insertCell(2);
-        const modsCell = newRow.insertCell(3);
-        const rankCell = newRow.insertCell(4);
-        const removeCell = newRow.insertCell(5);
+        // const beatmapIDCell = newRow.insertCell(1);
+        const beatmapNameCell = newRow.insertCell(1);
+        const modsCell = newRow.insertCell(2);
+        const rankCell = newRow.insertCell(3);
+        const removeCell = newRow.insertCell(4);
 
         const scoreLink = document.createElement('a');
         scoreLink.href = 'https://osu.ppy.sh/scores/osu/' + row["score_id"];
@@ -56,11 +56,11 @@ function addUserTopScores(scoreRows) {
 
         const beatmapLink = document.createElement('a');
         beatmapLink.href = row['beatmap_link'];
-        beatmapLink.innerHTML = `<i class="fa-solid fa-map"></i>`;
-        beatmapIDCell.appendChild(beatmapLink);
+        beatmapLink.innerHTML = row["beatmap_name"];
+        // beatmapIDCell.appendChild(beatmapLink);
 
-        beatmapNameCell.textContent = row["beatmap_name"];
-
+        // beatmapNameCell.textContent = row["beatmap_name"];
+        beatmapNameCell.appendChild(beatmapLink);
         modsCell.innerHTML = modsToImages(row["mods"]);
         modsCell.setAttribute('mods', row["mods"]);
 
@@ -104,11 +104,11 @@ function addUserScore(row) {
     const newRow = tableBody.insertRow(-1);
 
     const scoreIDCell = newRow.insertCell(0);
-    const beatmapIDCell = newRow.insertCell(1);
-    const beatmapNameCell = newRow.insertCell(2);
-    const modsCell = newRow.insertCell(3);
-    const rankCell = newRow.insertCell(4);
-    const removeCell = newRow.insertCell(5);
+    // const beatmapIDCell = newRow.insertCell(1);
+    const beatmapNameCell = newRow.insertCell(1);
+    const modsCell = newRow.insertCell(2);
+    const rankCell = newRow.insertCell(3);
+    const removeCell = newRow.insertCell(4);
 
     const scoreLink = document.createElement('a');
     scoreLink.href = 'https://osu.ppy.sh/scores/osu/' + row["score_id"];
@@ -117,11 +117,11 @@ function addUserScore(row) {
 
     const beatmapLink = document.createElement('a');
     beatmapLink.href = row['beatmap_link'];
-    beatmapLink.innerHTML = `<i class="fa-solid fa-map"></i>`;
-    beatmapIDCell.appendChild(beatmapLink);
+    beatmapLink.innerHTML = row["beatmap_name"];
+    // beatmapIDCell.appendChild(beatmapLink);
 
-    beatmapNameCell.textContent = row["beatmap_name"];
-
+    // beatmapNameCell.textContent = row["beatmap_name"];
+    beatmapNameCell.appendChild(beatmapLink);
     modsCell.innerHTML = modsToImages(row["mods"]);
     modsCell.setAttribute('mods', row["mods"]);
 
@@ -150,7 +150,7 @@ function fetchRecommendedBeatmaps() {
     for (let i = 0; i < userScores.length; i++) {
         // Jesus fucking christ.
         bm_id = /#osu\/(\d+)/.exec(userScores[i].cells[1].innerHTML)[0].replace('#osu/', '');
-        mods = userScores[i].cells[3].getAttribute("mods");
+        mods = userScores[i].cells[2].getAttribute("mods");
         userScoresArray.push(bm_id + '-' + mods);
     }
     const postData = {
@@ -172,27 +172,34 @@ function fetchRecommendedBeatmaps() {
 
 function addRecommendedBeatmaps(recommendedBeatmaps) {
     const tableBody = document.getElementById('recommendedBeatmapsBody');
-    // Clear tableBody
     tableBody.innerHTML = '';
 
     // For each recommended
     recommendedBeatmaps.forEach(beatmapSegment => {
         beatmapSegment.forEach(beatmap => {
             const newRow = tableBody.insertRow(-1);
-            const beatmapIDCell = newRow.insertCell(0);
             const beatmapLink = document.createElement('a');
-            const beatmapName = newRow.insertCell(1);
-            const stars = newRow.insertCell(2);
-            const length = newRow.insertCell(3);
-            const modsCell = newRow.insertCell(4);
+            const beatmapName = newRow.insertCell(0);
+            const stars = newRow.insertCell(1);
+            const ar = newRow.insertCell(2);
+            const bpm = newRow.insertCell(3);
+            const length = newRow.insertCell(4);
+            const modsCell = newRow.insertCell(5);
 
             beatmapLink.href = beatmap['beatmap_link'];
-            beatmapLink.innerHTML = `<i class="fa-solid fa-map"></i>`;
-            beatmapIDCell.appendChild(beatmapLink);
-            beatmapName.textContent = beatmap['title'];
-            stars.textContent = beatmap['stars'];
-            length.textContent = beatmap['length'];
+            beatmapLink.innerHTML = beatmap['title'];
+            beatmapName.appendChild(beatmapLink);
+        
+            stars.textContent = beatmap['difficulty_rating'];
+
+            ar.textContent = beatmap['ar'];
+
+            bpm.textContent = beatmap['bpm'];
+
+            length.textContent = beatmap['length_seconds'];
+
             modsCell.innerHTML = modsToImages(beatmap["mods"]);
+
             modsCell.setAttribute('mods', beatmap["mods"]);
         });
 
