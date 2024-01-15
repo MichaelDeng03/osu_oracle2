@@ -21,7 +21,7 @@ client_secret = "supersecretrandomstringfromosu"
 
 ```bash
 # Web application and user-input handling.
-backend/
+osu_oracle/
 
 # Model training and saved models.
 Models/
@@ -40,6 +40,7 @@ osu!Oracle is currently hosted live at osu-oracle.com.
 ## Contributing?
 
 Database schema can be found here: <https://dbdiagram.io/d/osu-654e8e887d8bbd6465f40357>.
+
 Please open an issue on github for a copy of the database, or scrape it yourself using the scripts provided in `/scraping.` `scrape_user_ids.py` will pull all ids from osu! leaderboards, `scrape_users.py` will pull all user data and top scores from those ids, and `scrape_maps.py` will pull all map data from the users' top 100 plays. Expect these scripts to run for about ~35hours in total due to osu! API rate limits.
 
 ## Disclaimer
