@@ -39,7 +39,7 @@ osu!Oracle is currently hosted live at osu-oracle.com.
 
 ## Contributing?
 
-## Data 
+### Data 
 
 Database schema can be found here: <https://dbdiagram.io/d/osu-654e8e887d8bbd6465f40357>.
 
@@ -50,6 +50,14 @@ Please open an issue on github for a copy of the database, or scrape it yourself
 To train a model, use `Models/nearest_neighbors.ipynb`. Create a corpus consisting of [beatmap_id-mods, beatmap_id-mods, ... , beatmap_id-mods] for each player's top scores. Use noHD_removed_mods for training a model where all HD is removed, standard_removed_mods otherwise - this is useful for players who think HD is a preference mod. 
 
 Then, train the model in the next notebook cell. The currently deployed model has vector_size 200 (denoted by 200d), 20 epochs, 100 window size (100 top plays), sg=0 (prohibitively expensive to use skip-gram, and order isn't particularly important), hs=0, and 16 worker threads. Refer to gensim docs for further information. 
+
+Save your trained model in the next cell. 
+
+### Deployment
+
+Osu Oracle is hosted using Flask, a lightweight web framework, Gunicorn, a Python WSGI server for handling requests, and Nginx, a web server and reverse proxy. Gunicorn and Nginx are not necessary for local development and model testing.
+
+For local development, run `python3 app.py` after updating model names. The application can then be found at <http://127.0.0.1:8000>.
 
 ## Disclaimer
 
