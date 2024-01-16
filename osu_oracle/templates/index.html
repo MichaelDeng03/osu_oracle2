@@ -102,10 +102,12 @@
                 <div class="section-color">
 
                     <p class="section-description">
-                        This section will recommend beatmaps based on submitted scores. Removing HD will change
-                        recommendations beyond just stripping HD from recommend maps. Detect skillsets will (attempt) to
-                        separate your submitted scores into 3 different skillsets, and recommend maps for each of them
-                        divided by horizontal line.
+                        This section will recommend beatmaps based on submitted scores.
+                        <br> Removing HD will change recommendations beyond just stripping HD from recommend maps (its
+                        trained on a model with HD removed). Good for players who think that HD is a preference mod.
+                        <br> Detect skillsets will (attempt) to
+                        separate your submitted scores into different skillsets, and recommend maps for each of them
+                        divided by horizontal line. HIGHLY RECOMMENDED. 
                     </p>
 
                     <button id="recommendBeatmaps" class="btn btn-success section-submit">Recommend Beatmaps</button>
@@ -113,6 +115,8 @@
                     <label for="noHD">Remove HD</label>
                     <input type="checkbox" id="detectSkillsets" name="detectSkillsets" value="detectSkillsets">
                     <label for="detectSkillsets">Detect Skillsets</label>
+                    <input type="number" id="numSkillsets" name="numSkillsets" min="2" max="10" value="3">
+                    <label for="numSkillsets">Number of Skillsets</label>
 
                     <div>
                         <table class="table table-dark table-striped" id="recommendedBeatmaps">

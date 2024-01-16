@@ -33,7 +33,7 @@ last_time = time.time()
 
 def scrape_users(ids):
     """
-    Adds user data to db after scraping.
+    Adds user data to users table and scores to scores in ../data/osu.db after scraping.
     ids: list of ids to scrape
     """
     global num_done

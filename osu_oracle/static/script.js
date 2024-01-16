@@ -52,11 +52,13 @@ function addUserTopScores(scoreRows) {
         const scoreLink = document.createElement('a');
         scoreLink.href = 'https://osu.ppy.sh/scores/osu/' + row["score_id"];
         scoreLink.innerHTML = `<i class="fa-solid fa-link"></i>`
+        scoreLink.target = "_blank"; // open in new tab
         scoreIDCell.appendChild(scoreLink);
 
         const beatmapLink = document.createElement('a');
         beatmapLink.href = row['beatmap_link'];
         beatmapLink.innerHTML = row["beatmap_name"];
+        beatmapLink.target = "_blank";
         // beatmapIDCell.appendChild(beatmapLink);
 
         // beatmapNameCell.textContent = row["beatmap_name"];
@@ -113,11 +115,13 @@ function addUserScore(row) {
     const scoreLink = document.createElement('a');
     scoreLink.href = 'https://osu.ppy.sh/scores/osu/' + row["score_id"];
     scoreLink.innerHTML = `<i class="fa-solid fa-link"></i>`
+    scoreLink.target = "_blank"; // open in new tab
     scoreIDCell.appendChild(scoreLink);
 
     const beatmapLink = document.createElement('a');
     beatmapLink.href = row['beatmap_link'];
     beatmapLink.innerHTML = row["beatmap_name"];
+    beatmapLink.target = "_blank";
     // beatmapIDCell.appendChild(beatmapLink);
 
     // beatmapNameCell.textContent = row["beatmap_name"];
@@ -145,6 +149,7 @@ function fetchRecommendedBeatmaps() {
     const userScores = document.getElementById('scoresTableBody').rows;
     const noHD = document.getElementById('noHD').checked;
     const detectSkillsets = document.getElementById('detectSkillsets').checked;
+    const numSkillsets = document.getElementById('numSkillsets').value;
     const userScoresArray = [];
 
     for (let i = 0; i < userScores.length; i++) {
@@ -156,7 +161,8 @@ function fetchRecommendedBeatmaps() {
     const postData = {
         user_scores: userScoresArray,
         noHD: noHD,
-        detectSkillsets: detectSkillsets
+        detectSkillsets: detectSkillsets,
+        numSkillsets: numSkillsets
     };
     fetch('/predict_beatmaps/', {
         method: 'POST',
@@ -188,8 +194,9 @@ function addRecommendedBeatmaps(recommendedBeatmaps) {
 
             beatmapLink.href = beatmap['beatmap_link'];
             beatmapLink.innerHTML = beatmap['title'];
+            beatmapLink.target = "_blank"; // open in new tab
             beatmapName.appendChild(beatmapLink);
-        
+
             stars.textContent = beatmap['difficulty_rating'];
 
             ar.textContent = beatmap['ar'];
@@ -206,10 +213,9 @@ function addRecommendedBeatmaps(recommendedBeatmaps) {
         // LINE GOES HERE
         const divider = tableBody.insertRow(-1);
         const dividerCell = divider.insertCell(0);
-        dividerCell.colSpan = 5;
+        dividerCell.colSpan = 6;
         hr = document.createElement('hr');
         dividerCell.appendChild(hr);
-
     });
 }
 

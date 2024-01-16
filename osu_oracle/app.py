@@ -23,15 +23,18 @@ conn = sqlite3.connect(
 )  # DANGER DANGER: need to lock acquire manually
 lock = threading.Lock()
 
+# word2vec_model_std = gensim.models.Word2Vec.load(
+#     "../Models/w2v_model_200d/w2v_model_200d"
+# )
 word2vec_model_std = gensim.models.Word2Vec.load(
-    "../Models/w2v_model_200d/w2v_model_200d"
+    "../Models/w2v_model_15d_50e/w2v_model_15d_50e"
 )
 NN_std = NearestNeighbors(n_neighbors=100, algorithm="ball_tree").fit(
     word2vec_model_std.wv.vectors
 )
 
 word2vec_model_noHD = gensim.models.Word2Vec.load(
-    "../Models/w2v_model_noHD_200d/w2v_model_noHD_200d"
+    "../Models/w2v_model_noHD_15d_50e/w2v_model_noHD_15d_50e"
 )
 NN_noHD = NearestNeighbors(n_neighbors=100, algorithm="ball_tree").fit(
     word2vec_model_noHD.wv.vectors
@@ -257,6 +260,7 @@ def predict_beatmaps():
     data = request.json
     noHD = data.get("noHD")
     detect_skillsets = data.get("detectSkillsets")
+    num_skillsets = int(data.get("numSkillsets"))
     user_scores = data.get("user_scores")
     # Need to decode mod names back to enum
 
@@ -288,6 +292,9 @@ def predict_beatmaps():
     ]
 
     user_scores = [tuple(word2vec_model.wv[score]) for score in user_scores]
+    num_skillsets = min(
+        len(user_scores), num_skillsets
+    )  # Don't want to create more clusters than there are scores
 
     # Cluster user scores so skillsets are not mixed.
     # xmeans tended to create 2 clusters only with like a 95/5 split.
@@ -303,21 +310,17 @@ def predict_beatmaps():
         # )
         # xmeans_instance.process()
         # centers = xmeans_instance.get_centers()
-        kmeans = KMeans(n_clusters=3, n_init=2, max_iter=50)  # Little bit of randomness
+        kmeans = KMeans(
+            n_clusters=num_skillsets, n_init=2, max_iter=50
+        )  # Little bit of randomness
         kmeans.fit(user_scores)
         centers = kmeans.cluster_centers_
     else:
         centers = [np.mean(user_scores, axis=0)]
 
-    centers = [
-        center
-        for center in centers
-        if len(center) > int(0.05 * len(user_scores))  # Remove tiny clusters
-    ]
     rows = []
 
     for center in centers:
-        # Consider it a cluster only if it has more than 5% of the scores
         rows_partition = []
         center = [np.array(center)]
         _, indices = NN.kneighbors(center)
@@ -342,7 +345,7 @@ def predict_beatmaps():
             row["length_seconds"] = strftime(
                 "%M:%S", gmtime(row["length_seconds"])
             )  # Not really an accurate name for it, but MM:SS is more readable, and I would rather do it here than in the JS where I don't know what i'm doing.
-            
+
             rows_partition.append(row)
 
         rows.append(rows_partition)

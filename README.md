@@ -49,7 +49,7 @@ Please open an issue on github for a copy of the database, or scrape it yourself
 
 To train a model, use `Models/nearest_neighbors.ipynb`. Create a corpus consisting of [beatmap_id-mods, beatmap_id-mods, ... , beatmap_id-mods] for each player's top scores. Use noHD_removed_mods for training a model where all HD is removed, standard_removed_mods otherwise - this is useful for players who think HD is a preference mod. 
 
-Then, train the model in the next notebook cell. The currently deployed model has vector_size 200 (denoted by 200d), 20 epochs, 100 window size (100 top plays), sg=0 (prohibitively expensive to use skip-gram, and order isn't particularly important), hs=0, and 16 worker threads. Refer to gensim docs for further information. 
+Then, train the model in the next notebook cell. The currently deployed model almost always has sg=0, hs=0, window=100, workers=16. I have experimented with different dimension vectors/training iterations. Typically, I find that overtraining is easy w/ available data Refer to gensim docs for further information regarding parameter tuning. 
 
 Save your trained model in the next cell. 
 
