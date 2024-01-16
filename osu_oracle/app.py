@@ -23,9 +23,6 @@ conn = sqlite3.connect(
 )  # DANGER DANGER: need to lock acquire manually
 lock = threading.Lock()
 
-# word2vec_model_std = gensim.models.Word2Vec.load(
-#     "../Models/w2v_model_200d/w2v_model_200d"
-# )
 word2vec_model_std = gensim.models.Word2Vec.load(
     "../Models/w2v_model_15d_50e/w2v_model_15d_50e"
 )
