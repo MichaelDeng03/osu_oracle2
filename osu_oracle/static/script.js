@@ -57,7 +57,7 @@ function addUserTopScores(scoreRows) {
 
         const beatmapLink = document.createElement('a');
         beatmapLink.href = row['beatmap_link'];
-        beatmapLink.innerHTML = row["beatmap_name"];
+        beatmapLink.innerHTML = row["title"];
         beatmapLink.target = "_blank";
         // beatmapIDCell.appendChild(beatmapLink);
 
@@ -120,7 +120,7 @@ function addUserScore(row) {
 
     const beatmapLink = document.createElement('a');
     beatmapLink.href = row['beatmap_link'];
-    beatmapLink.innerHTML = row["beatmap_name"];
+    beatmapLink.innerHTML = row["title"];
     beatmapLink.target = "_blank";
     // beatmapIDCell.appendChild(beatmapLink);
 

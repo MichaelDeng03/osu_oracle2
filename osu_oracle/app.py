@@ -13,7 +13,7 @@ from time import gmtime
 from sklearn.cluster import KMeans
 
 sys.path.insert(0, "../")
-from data.classes import Score, Beatmap, Beatmapset
+from data.classes import Score, Beatmap, Beatmapset, User
 from osu_access_token import client_id, client_secret
 
 app = Flask(__name__)
@@ -146,7 +146,10 @@ def get_beatmap_attr(beatmap_id, attr):
         return attr_res
 
 
-def get_beatmap_name(beatmap_id):
+def get_beatmap_title_and_link(beatmap_id):
+    """
+    Returns {title: title, beatmap_link: beatmap_link}
+    """
     conn = sqlite3.connect("../data/osu.db")
     cursor = conn.cursor()
     try:
@@ -155,6 +158,7 @@ def get_beatmap_name(beatmap_id):
         version, beatmapset_id = cursor.fetchone()
         query = f"SELECT title FROM beatmapsets WHERE beatmapset_id = {beatmapset_id}"
         title = cursor.execute(query).fetchone()[0]
+
     except Exception as e:
         print(e)
         beatmap = Beatmap(api.beatmap(beatmap_id))
@@ -167,31 +171,13 @@ def get_beatmap_name(beatmap_id):
         lock.release()
         title = beatmapset.title
         version = beatmap.version
-
-    finally:
-        return f"{title} [{version}]"
-
-
-def get_beatmap_link(beatmap_id):
-    conn = sqlite3.connect("../data/osu.db")
-    cursor = conn.cursor()
-    try:
-        query = f"SELECT beatmapset_id FROM beatmaps WHERE beatmap_id = {beatmap_id}"
-        beatmapset_id = cursor.execute(query).fetchone()[0]
-        query = f"SELECT beatmapset_link FFROM beatmapsets WHERE beatmapset_id = {beatmapset_id}"
-    except Exception as e:
-        print(e)
-        beatmap = Beatmap(api.beatmap(beatmap_id))
-        beatmapset = Beatmapset(api.beatmapset(beatmap.beatmapset_id))
         beatmapset_id = beatmap.beatmapset_id
 
-        lock.acquire()
-        beatmap.insert(cursor)
-        beatmapset.insert(cursor)
-        conn.commit()
-        lock.release()
     finally:
-        return f"https://osu.ppy.sh/beatmapsets/{beatmapset_id}#osu/{beatmap_id}"
+        return {
+            "title": f"{title} [{version}",
+            "beatmap_link": f"https://osu.ppy.sh/beatmapsets/{beatmapset_id}#osu/{beatmap_id}",
+        }
 
 
 @app.route("/get_user_scores/<int:user_id>")
@@ -203,7 +189,7 @@ def get_user_scores(user_id):
             try:
                 score = Score(score)
                 scores.append(score)
-                score.name = get_beatmap_name(score.beatmap_id)
+                # score.name = get_beatmap_name(score.beatmap_id)
             except Exception as e:
                 print(f"Error creating score object: {e}")
                 continue
@@ -212,8 +198,8 @@ def get_user_scores(user_id):
         print(e)
         return None
 
-    for score in scores:
-        score.mods = mod_enum_to_names(score.mods)
+    # for score in scores:
+    #     score.mods = mod_enum_to_names(score.mods)
 
     rows = []
     for score in scores:
@@ -221,12 +207,20 @@ def get_user_scores(user_id):
             {
                 "score_id": score.score_id,
                 "beatmap_id": score.beatmap_id,
-                "beatmap_link": get_beatmap_link(score.beatmap_id),
-                "beatmap_name": score.name,
-                "mods": score.mods,
+                "mods": mod_enum_to_names(score.mods),
                 "rank": score.rank,
             }
         )
+        rows[-1].update(get_beatmap_title_and_link(score.beatmap_id))
+
+    try:
+        for score in scores:
+            cursor = conn.cursor()
+            score.insert(cursor)
+            conn.commit()
+    except Exception as e:
+        print(e)
+        print(f"Error inserting scores into db")
 
     return jsonify(rows)
 
@@ -234,17 +228,18 @@ def get_user_scores(user_id):
 @app.route("/get_user_score/<int:score_id>")
 def get_user_score(score_id):
     score = Score(api.score("osu", score_id))
-    score.mods = mod_enum_to_names(score.mods)
-    score.name = get_beatmap_name(score.beatmap_id)
 
     row = {
         "score_id": score.score_id,
-        # "beatmap_id": score.beatmap_id,
-        "beatmap_link": get_beatmap_link(score.beatmap_id),
-        "beatmap_name": score.name,
-        "mods": score.mods,
+        "mods": mod_enum_to_names(score.mods),
         "rank": score.rank,
     }
+    row.update(get_beatmap_title_and_link(score.beatmap_id))
+
+    cursor = conn.cursor()
+    score.insert(cursor)
+    conn.commit()
+
     return jsonify(row)
 
 
@@ -328,10 +323,9 @@ def predict_beatmaps():
         for beatmap_and_mods in beatmaps_and_mods:
             beatmap_id, mods = beatmap_and_mods.split("-")
             row = {
-                "beatmap_link": get_beatmap_link(beatmap_id),
                 "mods": mod_enum_to_names(int(mods)),
-                "title": get_beatmap_name(beatmap_id),
             }
+            row.update(get_beatmap_title_and_link(beatmap_id))
             row.update(
                 get_beatmap_attr(
                     beatmap_id,
