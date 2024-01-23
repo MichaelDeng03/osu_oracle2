@@ -182,6 +182,9 @@ def get_beatmap_title_and_link(beatmap_id):
 
 @app.route("/get_user_scores/<int:user_id>")
 def get_user_scores(user_id):
+    """
+    Gets top 100 scores for user_id, returns a jsonified list of dictionaries for frontend
+    """
     try:
         top_scores = api.user_scores(user_id, type="best", mode="osu", limit=100)
         scores = []
@@ -189,7 +192,6 @@ def get_user_scores(user_id):
             try:
                 score = Score(score)
                 scores.append(score)
-                # score.name = get_beatmap_name(score.beatmap_id)
             except Exception as e:
                 print(f"Error creating score object: {e}")
                 continue
@@ -197,9 +199,6 @@ def get_user_scores(user_id):
     except Exception as e:
         print(e)
         return None
-
-    # for score in scores:
-    #     score.mods = mod_enum_to_names(score.mods)
 
     rows = []
     for score in scores:
@@ -220,13 +219,16 @@ def get_user_scores(user_id):
             conn.commit()
     except Exception as e:
         print(e)
-        print(f"Error inserting scores into db")
+        print("Error inserting scores into db")
 
     return jsonify(rows)
 
 
 @app.route("/get_user_score/<int:score_id>")
 def get_user_score(score_id):
+    """
+    Gets score info for score_id, returns a jsonified dictionary for frontend. Almost the same as get_user_scores, but only one score.
+    """
     score = Score(api.score("osu", score_id))
 
     row = {
@@ -284,27 +286,10 @@ def predict_beatmaps():
     ]
 
     user_scores = [tuple(word2vec_model.wv[score]) for score in user_scores]
-    num_skillsets = min(
-        len(user_scores), num_skillsets
-    )  # Don't want to create more clusters than there are scores
+    num_skillsets = min(len(user_scores), num_skillsets)
 
-    # Cluster user scores so skillsets are not mixed.
-    # xmeans tended to create 2 clusters only with like a 95/5 split.
     if detect_skillsets:
-        # xmeans_instance = xmeans(
-        #     data=user_scores,
-        #     initial_centers=None,
-        #     kmax=5,
-        #     tolerance=0.0001    ,
-        #     ccore=True,
-        #     repeat=10,
-        #     random_state=2,
-        # )
-        # xmeans_instance.process()
-        # centers = xmeans_instance.get_centers()
-        kmeans = KMeans(
-            n_clusters=num_skillsets, n_init=2, max_iter=50
-        )  # Little bit of randomness
+        kmeans = KMeans(n_clusters=num_skillsets, n_init=2, max_iter=50)
         kmeans.fit(user_scores)
         centers = kmeans.cluster_centers_
     else:

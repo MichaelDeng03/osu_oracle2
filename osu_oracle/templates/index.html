@@ -65,6 +65,9 @@
                         This section is used to specify maps to base your recommendations on.
                         This can be done by fetching your top plays from your profile link, or submitting individual
                         score links.
+                        <br> Recommender DOES NOT take into account stuff like acc or misses, ONLY the beatmap and mods.
+                        This can be useful for recommending similar maps to a map you just played, even if you are bad
+                        and can't FC.
                     </p>
 
                     <label for="userID">Profile URL</label>
@@ -105,11 +108,13 @@
                     <p class="section-description">
                         This section will recommend beatmaps based on submitted scores.
                         <br> Removing HD will change recommendations beyond just stripping HD from recommend maps (its
-                        trained on a model with HD removed). Good for players who think that HD is a preference mod.
+                        trained on a model with HD removed). Good for players who think that HD is a preference/comfort
+                        mod.
                         <br> Detect skillsets will (attempt) to
-                        separate your submitted scores into different skillsets, and recommend maps for each of them
+                        separate your submitted scores into different skillsets (not technically accurate), and
+                        recommend maps for each of them
                         divided by horizontal line. HIGHLY HIGHLY HIGHLY HIGHLY RECOMMENDED (higher usually better, but
-                        i haven't removed duplicates so have fun :D).
+                        i haven't removed duplicates so.....).
                     </p>
 
                     <button id="recommendBeatmaps" class="btn btn-success section-submit">Recommend Beatmaps</button>
