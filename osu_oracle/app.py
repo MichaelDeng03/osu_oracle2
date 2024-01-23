@@ -175,7 +175,7 @@ def get_beatmap_title_and_link(beatmap_id):
 
     finally:
         return {
-            "title": f"{title} [{version}",
+            "title": f"{title} [{version}]",
             "beatmap_link": f"https://osu.ppy.sh/beatmapsets/{beatmapset_id}#osu/{beatmap_id}",
         }
 
