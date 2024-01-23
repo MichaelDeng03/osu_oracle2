@@ -26,14 +26,14 @@ lock = threading.Lock()
 word2vec_model_std = gensim.models.Word2Vec.load(
     "../Models/w2v_model_15d_50e/w2v_model_15d_50e"
 )
-NN_std = NearestNeighbors(n_neighbors=100, algorithm="ball_tree").fit(
+NN_std = NearestNeighbors(n_neighbors=200, algorithm="ball_tree").fit(
     word2vec_model_std.wv.vectors
 )
 
 word2vec_model_noHD = gensim.models.Word2Vec.load(
     "../Models/w2v_model_noHD_15d_50e/w2v_model_noHD_15d_50e"
 )
-NN_noHD = NearestNeighbors(n_neighbors=100, algorithm="ball_tree").fit(
+NN_noHD = NearestNeighbors(n_neighbors=200, algorithm="ball_tree").fit(
     word2vec_model_noHD.wv.vectors
 )
 
@@ -317,7 +317,7 @@ def predict_beatmaps():
         center = [np.array(center)]
         _, indices = NN.kneighbors(center)
         beatmaps_and_mods = [word2vec_model.wv.index_to_key[i] for i in indices[0]][
-            : int(100 / len(centers))
+            : int(200 / len(centers))
         ]  # Remove a couple of recommendations to make space for other clusters
 
         for beatmap_and_mods in beatmaps_and_mods:
